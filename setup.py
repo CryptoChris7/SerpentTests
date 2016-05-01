@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from distutils.core import setup
 
-setup(name='SerpentTester',
+setup(name='SerpentTests',
       version='1.0',
       description='Serpent Contract Testing Class',
       author='ChrisCalderon',
