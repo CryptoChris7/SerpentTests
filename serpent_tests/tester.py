@@ -1,6 +1,7 @@
 '''A small module for testing Serpent code.'''
 import warnings; warnings.simplefilter('ignore')
 from ethereum import tester as t
+from ethereum.utils import coerce_to_int
 from colorama import Fore, Style, init; init()
 import sys
 
@@ -8,8 +9,23 @@ passed = Fore.GREEN + 'passed' + Style.RESET_ALL + ';'
 failed = Style.BRIGHT + Fore.RED + 'failed' + Style.RESET_ALL + ';'
 
 
+class Account(object):
+    def __init__(self, rawaddr, privkey):
+        self.hexaddr = rawaddr.encode('hex')
+        self.privkey = self.private_key = privkey
+        self.address = rawaddr
+        self.address_as_int = coerce_to_int(rawaddr)
+
+    def __str__(self):
+        return "<account: 0x{}>".format(self.hexaddr)
+
+    def __repr__(self):
+        return "Account({}, {})".format(self.rawaddr, self.privkey)
+
+
 class Tester(object):
     state = t.state()
+    accounts = map(Account, zip(t.accounts, t.keys))
     def __init__(self, code, global_state=False):
         self.code = code
         if not global_state:
@@ -58,7 +74,7 @@ class Tester(object):
                 print failed
                 print '  caught unknown exception during test {}'.format(i)
                 print '  test case:', case
-                print '  exception:', type(exc), dir(exc)
+                print '  exception:', type(exc), exc
                 sys.exit(1)
 
             if result == expected:
