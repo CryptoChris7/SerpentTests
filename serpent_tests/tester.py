@@ -25,7 +25,7 @@ class Account(object):
 
 class Tester(object):
     state = t.state()
-    accounts = map(Account, zip(t.accounts, t.keys))
+    accounts = map(Account, t.accounts, t.keys)
     def __init__(self, code, global_state=False):
         self.code = code
         if not global_state:
