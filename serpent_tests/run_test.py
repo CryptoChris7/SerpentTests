@@ -1,6 +1,4 @@
-from . import Tester
-from ethereum.tester import a0, a1, k1
-from ethereum.utils import coerce_to_int
+from serpent_tests import Tester
 
 def main():
     code = '''\
@@ -13,11 +11,13 @@ def double(x):
 def echo_sender():
     return(msg.sender)'''
     t = Tester(code)
-    
+    a0 = t.accounts[0].address_as_int
+    a1 = t.accounts[1].address_as_int
+    k1 = t.accounts[1].privkey
     t.run_tests([('foo', (), {}, "foo"),
                  ('double', (3,), {}, 6),
-                 ('echo_sender', (), {}, coerce_to_int(a0)),
-                 ('echo_sender', (), {'sender': k1}, coerce_to_int(a1))])
+                 ('echo_sender', (), {}, a0),
+                 ('echo_sender', (), {'sender': k1}, a1)])
 
 if __name__ == '__main__':
     main()
