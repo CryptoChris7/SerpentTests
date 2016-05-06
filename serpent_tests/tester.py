@@ -30,7 +30,9 @@ class Tester(object):
         self.code = code
         if not global_state:
             self.state = t.state()
+        start_gas = self.state.block.gas_used
         self.contract = self.state.abi_contract(self.code)
+        self.gas_cost = self.state.block.gas_used - start_gas
         for name, obj in vars(self.contract).items():
             if getattr(obj, '__name__', '') == 'kall':
                 obj.__name__ = str(name)

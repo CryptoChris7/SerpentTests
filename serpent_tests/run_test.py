@@ -13,6 +13,11 @@ def double(x):
 def echo_sender():
     return(msg.sender)'''
     t = Tester(code)
+    print 'Contract code:'
+    print '--------------'
+    print code
+    print '--------------'
+    print 'Gas cost:', t.gas_cost
     
     t.run_tests([('foo', (), {}, "foo"),
                  ('double', (3,), {}, 6),
