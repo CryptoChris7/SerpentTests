@@ -20,7 +20,7 @@ class Account(object):
         return "<account: 0x{}>".format(self.hexaddr)
 
     def __repr__(self):
-        return "Account({}, {})".format(self.rawaddr, self.privkey)
+        return "Account({!r}, {!r})".format(self.rawaddr, self.privkey)
 
 
 class Tester(object):
@@ -32,6 +32,7 @@ class Tester(object):
             self.state = t.state()
         start_gas = self.state.block.gas_used
         self.contract = self.state.abi_contract(self.code)
+        self.contractAccount = Account(self.contract.address, None)
         self.gas_cost = self.state.block.gas_used - start_gas
         for name, obj in vars(self.contract).items():
             if getattr(obj, '__name__', '') == 'kall':

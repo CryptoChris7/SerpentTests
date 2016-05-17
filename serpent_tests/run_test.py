@@ -18,6 +18,8 @@ def echo_sender():
     print '--------------'
     print 'Gas cost:', t.gas_cost
     print '--------------'
+    print 'Contract address:', str(t.contractAccount)
+    print '--------------'
     
     a0 = t.accounts[0].address_as_int
     a1 = t.accounts[1].address_as_int
