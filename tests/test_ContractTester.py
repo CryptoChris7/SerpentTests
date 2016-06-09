@@ -16,8 +16,10 @@ class TestContractTester(object):
         a0 = Accounts[0]
         a1 = Accounts[1]
         tester = ContractTester(CODE)
-        tester.foo(expects="foo", asserts=Assert.equal)
-        tester.double(args=(3,), expects=6, asserts=Assert.equal)
-        tester.double(args=(4,), 
-        tester.echo_sender(expects=a0.as_int, asserts=Assert.equal)
-        tester.echo_sender(expects=a1.as_int, asserts=Assert.equal, kwds={'sender': a1.privkey})
+        tester.foo(expects="foo")
+        tester.foo(expects="bar", asserts=Assert.unequal)
+        tester.double(args=(3,), expects=6)
+        tester.double(args=(4,), expects=10, asserts=Assert.lt)
+        tester.echo_sender(expects=a0.as_int)
+        tester.echo_sender(expects=a1.as_int, kwds={'sender': a1.privkey})
+        tester.echo_sender(expects=a0.as_int/2, asserts=Assert.gt)
