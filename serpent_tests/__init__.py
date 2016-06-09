@@ -86,7 +86,7 @@ class ContractTester(object):
             if raises is not None and not issubclass(Exception, raises):
                 raise ContractTestError("'raises' argument must be a subclass of Exception")
 
-            asserts = kwds.get('asserts', None)
+            asserts = kwds.get('asserts', Assert.equal)
             if asserts not in Assert:
                 raise ContractTestError("Invalid value for 'asserts' keyword: {}".format(asserts))
 
