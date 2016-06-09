@@ -113,7 +113,7 @@ class ContractTester(object):
             elif asserts is Assert.ge:
                 assert result >= expects
             else:
-                raise ContractError("black magic is afoot!")
+                raise ContractTesterError("black magic is afoot!")
                 
         tester_func.__name__ = name
         tester_func.__doc__ = 'Wrapper for testing the {} function.'
