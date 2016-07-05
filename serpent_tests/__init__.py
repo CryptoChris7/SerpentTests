@@ -18,7 +18,7 @@ del fake_stdout
 del old_io
 
 
-Assert = enum.Enum("Asserts", "equal,unequal,lt,gt,le,ge")
+Assert = enum.Enum("Assert", "equal,unequal,lt,gt,le,ge")
 
 
 class ContractTesterError(Exception): pass
