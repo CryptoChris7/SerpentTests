@@ -2,6 +2,7 @@
 import sys
 import os
 import enum
+import operator
 
 # Stop the warning about python cache
 # without disabling warnings system wide
@@ -18,10 +19,17 @@ del fake_stdout
 del old_io
 
 
-Assert = enum.Enum("Assert", "equal,unequal,lt,gt,le,ge")
+Assert = enum.Enum("Assert", "eq,ne,lt,gt,le,ge")
+compare_ops = {
+    Assert.eq: operator.eq,
+    Assert.ne: operator.ne,
+    Assert.lt: operator.lt,
+    Assert.gt: operator.gt,
+    Assert.le: operator.le,
+    Assert.ge: operator.ge,
+}
 
-
-class ContractTesterError(Exception): pass
+class ContractTestError(Exception): pass
 
 
 class Account(object):
@@ -41,12 +49,54 @@ class Account(object):
 
 Accounts = map(Account, t.accounts, t.keys)
 
-class ContractTester(object):
+
+def tester(func, name):
+    """A wrapper function for testing serpent functions in an AbiContract."""
+
+    def test_func(**kwds):
+        """Test function {!r}.
+
+        Keyword Arguments:
+        args -- a tuple or list of arguments to pass to the function.
+        kwds -- a dict of keywords to pass to the function.
+        asserts -- a member of the Assert enum that specifies the comparison to make.
+        expects -- a value to compare against the result of the function call.
+        """
+        args = kwds.get('args', ())
+        for arg in args:
+            if not isinstance(arg, ContractTest.arg_types):
+                err_msg = "Invalid argument type, must be int, long, str, list, or tuple: <arg: {}>; <type: {}>"
+                raise ContractTestError(err_msg.format(arg, type(arg)))
+
+        other_kwds = kwds.get('kwds', {})
+        if not isinstance(other_kwds, dict):
+            raise ContractTestError("'kwds' argument must be a dict.")
+
+        asserts = kwds.get('asserts', Assert.eq)
+        if asserts not in Assert:
+            raise ContractTestError("Invalid value for 'asserts' keyword: {}".format(asserts))
+
+        compare = kwds.get('compare', None)
+        if not isinstance(compare, ContractTest.allowed_types):
+            err_msg = "Invalid type for 'compare', must be int, str, list, or tuple: {!r}"
+            raise ContractTestError(err_msg.format(compare))
+
+        result = func(*args, **other_kwds)
+        comparison = compare_ops[asserts]
+        assert comparison(result, compare)
+
+    test_func.__name__ = name
+    test_func.__doc__ = test_func.__doc__.format(name)
+    return test_func
+
+
+
+class ContractTest(object):
     """A class for testing the results of Serpent contracts."""
     # TODO: replace pyethereum test state with geth or parity based testnet.
 
     global_state = t.state()
-    expected_types = int, long, str, list, type(None)
+    allowed_types = int, long, str, list, type(None)
     arg_types = int, long, str, list, tuple
 
     def __init__(self, code, global_state=False):
@@ -60,62 +110,5 @@ class ContractTester(object):
         
         # pyethereum's AbiContracts don't name their functions correctly >:(
         for name, obj in vars(self.contract).items():
-            if getattr(obj, '__name__', '') == 'kall':
-                obj.__name__ = str(name)
-
-    def __getattr__(self, name):
-        # wraps abi functions for easy testing
-        contract_func = getattr(self.contract, name, None)
-        if contract_func is None:
-            err_msg = "No contract function with that name: {}"
-            raise ContractTesterError(err_msg.format(name))
-
-        def tester_func(**kwds):
-            args = kwds.get('args', ())
-            for arg in args:
-                if not isinstance(arg, ContractTester.arg_types):
-                    err_msg = "Invalid argument type, must be int, str, list, or tuple: <arg: {}>; <type: {}>"
-                    raise ContractTesterError(err_msg.format(arg, type(arg)))
-
-            expects = kwds.get('expects', None)
-            if not isinstance(expects, ContractTester.expected_types):
-                err_msg = "Invalid expected-value type, must be int, str, list, or tuple: <val: {}>; <type: {}>"
-                raise ContractTesterError(err_msg.format(expects, type(expects)))        
-
-            raises = kwds.get('raises', None)
-            if raises is not None and not issubclass(Exception, raises):
-                raise ContractTestError("'raises' argument must be a subclass of Exception")
-
-            asserts = kwds.get('asserts', Assert.equal)
-            if asserts not in Assert:
-                raise ContractTestError("Invalid value for 'asserts' keyword: {}".format(asserts))
-
-            other_kwds = kwds.get('kwds', {})
-            if not isinstance(other_kwds, dict):
-                raise ContractTestError("'other_kwds' argument must be a dict.")
-
-            try:
-                result = contract_func(*args, **other_kwds)
-            except Exception as exc:
-                if not isinstance(exc, raises):
-                    raise ContractTesterError("Unexpected exception: {}: {}".format(type(exc), exc))
-
-            if asserts is Assert.equal:
-                assert result == expects
-            elif asserts is Assert.unequal:
-                assert result != expects
-            elif asserts is Assert.lt:
-                assert result < expects
-            elif asserts is Assert.le:
-                assert result <= expects
-            elif asserts is Assert.gt:
-                assert result > expects
-            elif asserts is Assert.ge:
-                assert result >= expects
-            else:
-                raise ContractTesterError("black magic is afoot!")
-                
-        tester_func.__name__ = name
-        tester_func.__doc__ = 'Wrapper for testing the {} function.'
-        setattr(self, name, tester_func)
-        return tester_func
+            if hasattr(obj, '__func__') and getattr(obj.__func__, '__name__', '') == 'kall':
+                setattr(self, name, tester(obj, name))

@@ -1,4 +1,4 @@
-from serpent_tests import ContractTester, Assert, Accounts
+from serpent_tests import ContractTest, Assert, Accounts
 
 CODE = '''\
 def foo():
@@ -15,11 +15,11 @@ class TestContractTester(object):
     def test(self):
         a0 = Accounts[0]
         a1 = Accounts[1]
-        tester = ContractTester(CODE)
-        tester.foo(expects="foo")
-        tester.foo(expects="bar", asserts=Assert.unequal)
-        tester.double(args=(3,), expects=6)
-        tester.double(args=(4,), expects=10, asserts=Assert.lt)
-        tester.echo_sender(expects=a0.as_int)
-        tester.echo_sender(expects=a1.as_int, kwds={'sender': a1.privkey})
-        tester.echo_sender(expects=a0.as_int/2, asserts=Assert.gt)
+        tester = ContractTest(CODE)
+        tester.foo(compare="foo")
+        tester.foo(compare="bar", asserts=Assert.ne)
+        tester.double(args=(3,), compare=6)
+        tester.double(args=(4,), compare=10, asserts=Assert.lt)
+        tester.echo_sender(compare=a0.as_int)
+        tester.echo_sender(compare=a1.as_int, kwds={'sender': a1.privkey})
+        tester.echo_sender(compare=a0.as_int/2, asserts=Assert.gt)
