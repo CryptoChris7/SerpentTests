@@ -1,4 +1,5 @@
-from serpent_tests import ContractTest, Assert, Accounts
+from serpent_tests import ContractTest, Assert, Accounts, ContractTestError
+import pytest
 
 CODE = '''\
 def foo():
@@ -11,15 +12,25 @@ def echo_sender():
     return(msg.sender)'''
 
 
-class TestContractTester(object):
-    def test(self):
+def test_ContractTest():
         a0 = Accounts[0]
         a1 = Accounts[1]
-        tester = ContractTest(CODE)
-        tester.foo(compare="foo")
-        tester.foo(compare="bar", asserts=Assert.ne)
-        tester.double(args=(3,), compare=6)
-        tester.double(args=(4,), compare=10, asserts=Assert.lt)
-        tester.echo_sender(compare=a0.as_int)
-        tester.echo_sender(compare=a1.as_int, kwds={'sender': a1.privkey})
-        tester.echo_sender(compare=a0.as_int/2, asserts=Assert.gt)
+        test = ContractTest(CODE)
+        test.foo(compare="foo")
+        test.foo(compare="bar", asserts=Assert.ne)
+        test.double(args=(3,), compare=6)
+        test.double(args=(4,), compare=10, asserts=Assert.lt)
+        test.echo_sender(compare=a0.as_int)
+        test.echo_sender(compare=a1.as_int, kwds={'sender': a1.privkey})
+
+        with pytest.raises(ContractTestError):
+            test.double(args=(1.2,))
+
+        with pytest.raises(ContractTestError):
+            test.echo_sender(kwds=(('sender', a1.privkey)))
+
+        with pytest.raises(ContractTestError):
+            test.foo(compare="bar", asserts=False)
+
+        with pytest.raises(ContractTestError):
+            test.foo(compare=bytearray("bar"), asserts=Assert.ne)

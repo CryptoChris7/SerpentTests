@@ -3,6 +3,7 @@ import sys
 import os
 import enum
 import operator
+from types import MethodType
 
 # Stop the warning about python cache
 # without disabling warnings system wide
@@ -29,6 +30,7 @@ compare_ops = {
     Assert.ge: operator.ge,
 }
 
+
 class ContractTestError(Exception): pass
 
 
@@ -44,7 +46,7 @@ class Account(object):
         return "<account: 0x{}>".format(self.hexaddr)
 
     def __repr__(self):
-        return "Account({!r}, {!r})".format(self.rawaddr, self.privkey)
+        return "Account(rawaddr={!r}, privkey={!r})".format(self.address, self.privkey)
 
 
 Accounts = map(Account, t.accounts, t.keys)
@@ -53,7 +55,7 @@ Accounts = map(Account, t.accounts, t.keys)
 def tester(func, name):
     """A wrapper function for testing serpent functions in an AbiContract."""
 
-    def test_func(**kwds):
+    def test_func(args=(), kwds={}, asserts=Assert.eq, compare=None):
         """Test function {!r}.
 
         Keyword Arguments:
@@ -62,26 +64,22 @@ def tester(func, name):
         asserts -- a member of the Assert enum that specifies the comparison to make.
         expects -- a value to compare against the result of the function call.
         """
-        args = kwds.get('args', ())
         for arg in args:
             if not isinstance(arg, ContractTest.arg_types):
                 err_msg = "Invalid argument type, must be int, long, str, list, or tuple: <arg: {}>; <type: {}>"
                 raise ContractTestError(err_msg.format(arg, type(arg)))
 
-        other_kwds = kwds.get('kwds', {})
-        if not isinstance(other_kwds, dict):
+        if not isinstance(kwds, dict):
             raise ContractTestError("'kwds' argument must be a dict.")
 
-        asserts = kwds.get('asserts', Assert.eq)
         if asserts not in Assert:
             raise ContractTestError("Invalid value for 'asserts' keyword: {}".format(asserts))
 
-        compare = kwds.get('compare', None)
         if not isinstance(compare, ContractTest.allowed_types):
             err_msg = "Invalid type for 'compare', must be int, str, list, or tuple: {!r}"
             raise ContractTestError(err_msg.format(compare))
 
-        result = func(*args, **other_kwds)
+        result = func(*args, **kwds)
         comparison = compare_ops[asserts]
         assert comparison(result, compare)
 
@@ -108,7 +106,6 @@ class ContractTest(object):
         self.contractAccount = Account(self.contract.address, None)
         self.gas_cost = self.state.block.gas_used - start_gas
         
-        # pyethereum's AbiContracts don't name their functions correctly >:(
         for name, obj in vars(self.contract).items():
-            if hasattr(obj, '__func__') and getattr(obj.__func__, '__name__', '') == 'kall':
+            if isinstance(obj, MethodType) and obj.__func__.__name__ == 'kall':
                 setattr(self, name, tester(obj, name))
