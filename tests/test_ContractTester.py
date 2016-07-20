@@ -24,13 +24,13 @@ def test_ContractTest():
         test.echo_sender(compare=a1.as_int, kwds={'sender': a1.privkey})
 
         with pytest.raises(ContractTestError):
-            test.double(args=(1.2,))
+            test.double(args=(1.2,))  # float's aren't allowed as args
 
         with pytest.raises(ContractTestError):
-            test.echo_sender(kwds={'sender': a1.privkey})
+            test.echo_sender(compare=a1.as_int, kwds=('sender', a1.privkey))  # kwds not a dict
 
         with pytest.raises(ContractTestError):
-            test.foo(compare="bar", asserts=False)
+            test.foo(compare="bar", asserts=False)  # asserts not a member of Assert enum
 
         with pytest.raises(ContractTestError):
-            test.foo(compare=bytearray("bar"), asserts=Assert.ne)
+            test.foo(compare=bytearray("bar"), asserts=Assert.ne)  # bytearray not allowed in compare
