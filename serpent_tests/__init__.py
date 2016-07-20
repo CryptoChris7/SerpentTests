@@ -1,24 +1,10 @@
 '''A small module for testing Serpent code, for use with py.test.'''
-import sys
-import os
 import enum
 import operator
 from types import MethodType
-
-# Stop the warning about python cache
-# without disabling warnings system wide
-old_io = sys.stdout, sys.stderr
-
-with open(os.devnull, 'w') as fake_stdout:
-    sys.stdout = fake_stdout
-    sys.stderr = fake_stdout
-    from ethereum import tester as t
-    from ethereum.utils import coerce_to_int
-
-sys.stdout, sys.stderr = old_io
-del fake_stdout
-del old_io
-
+from warnings import simplefilter; simplefilter('ignore')
+from ethereum import tester as t
+from ethereum.utils import coerce_to_int
 
 Assert = enum.Enum("Assert", "eq,ne,lt,gt,le,ge")
 compare_ops = {
@@ -31,7 +17,8 @@ compare_ops = {
 }
 
 
-class ContractTestError(Exception): pass
+class ContractTestError(Exception):
+    pass
 
 
 class Account(object):
@@ -49,7 +36,7 @@ class Account(object):
         return "Account(rawaddr={!r}, privkey={!r})".format(self.address, self.privkey)
 
 
-Accounts = map(Account, t.accounts, t.keys)
+ACCOUNTS = map(Account, t.accounts, t.keys)
 
 
 def tester(func, name):
@@ -86,7 +73,6 @@ def tester(func, name):
     test_func.__name__ = name
     test_func.__doc__ = test_func.__doc__.format(name)
     return test_func
-
 
 
 class ContractTest(object):

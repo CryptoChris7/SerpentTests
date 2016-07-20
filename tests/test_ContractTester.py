@@ -1,4 +1,4 @@
-from serpent_tests import ContractTest, Assert, Accounts, ContractTestError
+from serpent_tests import ContractTest, Assert, ACCOUNTS, ContractTestError
 import pytest
 
 CODE = '''\
@@ -13,8 +13,8 @@ def echo_sender():
 
 
 def test_ContractTest():
-        a0 = Accounts[0]
-        a1 = Accounts[1]
+        a0 = ACCOUNTS[0]
+        a1 = ACCOUNTS[1]
         test = ContractTest(CODE)
         test.foo(compare="foo")
         test.foo(compare="bar", asserts=Assert.ne)
@@ -27,7 +27,7 @@ def test_ContractTest():
             test.double(args=(1.2,))
 
         with pytest.raises(ContractTestError):
-            test.echo_sender(kwds=(('sender', a1.privkey)))
+            test.echo_sender(kwds={'sender': a1.privkey})
 
         with pytest.raises(ContractTestError):
             test.foo(compare="bar", asserts=False)
