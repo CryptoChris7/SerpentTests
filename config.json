@@ -1,8 +1,0 @@
-{
-  "name": "serpent_tests",
-  "version": "1.0dev1",
-  "description": "Serpent contract testing class.",
-  "author": "Chris Calderon",
-  "author_email": "pythonwiz@protonmail.com",
-  "packages": ["serpent_tests"]
-}
