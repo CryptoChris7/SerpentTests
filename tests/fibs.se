@@ -1,0 +1,9 @@
+def fib(n):
+    with a = 0:
+        with b = 1:
+            while n > 0:
+                with temp = a + b:
+                    a = b
+                    b = temp
+                n -= 1
+            return(a)

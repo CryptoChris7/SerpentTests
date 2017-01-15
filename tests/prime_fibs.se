@@ -1,0 +1,10 @@
+import fibs as FIBS
+import primes as PRIMES
+
+def prime_fib_gt(n):
+    with i = 0:
+        with m = FIBS.fib(i):
+            while !((m > n) and PRIMES.is_prime(m)):
+                i += 1
+                m = FIBS.fib(i)
+            return(m)

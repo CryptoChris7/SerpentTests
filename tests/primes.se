@@ -1,0 +1,13 @@
+def is_prime(n):
+    if n < 2:
+        return(0:bool)
+    if n == 2:
+        return(1:bool)
+    if !(n&1):
+        return(0:bool)
+    with i = 3:
+        while i*i < n:
+            if n%i == 0:
+                return(0:bool)
+            i += 2
+        return(1:bool)
