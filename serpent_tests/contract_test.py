@@ -19,10 +19,14 @@ class ContractTest(unittest.TestCase):
         start_nonce = cls.state.block.get_nonce(cls.creator_address)
 
         cls.source_info_map = OrderedDict()
-        for i, name in enumerate(cls.source_map):
-            source = cls.source_map[name]
-            cls.source_info_map[name] = SourceInfo(
-                name, source, cls.creator_address, start_nonce + i)
+        for i, path in enumerate(cls.source_map):
+            source = cls.source_map[path]
+            cls.source_info_map[path] = SourceInfo(
+                path=path,
+                impure_source=source,
+                creator=cls.creator_address,
+                nonce=(start_nonce + i)
+            )
 
         for source in cls.source_info_map.values():
             setattr(
