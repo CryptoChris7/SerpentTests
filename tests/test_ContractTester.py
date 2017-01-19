@@ -20,6 +20,7 @@ class MyTest(serpent_tests.ContractTest):
     def test_prime_fib_gt(self):
         self.assertEqual(self.prime_fibs.prime_fib_gt(3), 5)
         self.assertEqual(self.prime_fibs.prime_fib_gt(6), 13)
+        self.assertEqual(self.prime_fibs.prime_fib_gt(20), 89)
 
 
 if __name__ == '__main__':
