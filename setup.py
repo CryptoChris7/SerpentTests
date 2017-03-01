@@ -3,7 +3,7 @@ import os
 import re
 import ast
 
-HTTP = re.compile('^https?://.+#egg=(.+)$')
+REMOTE = re.compile('^(?:git\+)?https?://.+#egg=(.+)$')
 
 
 class UniversalSetupError(Exception):
@@ -17,7 +17,7 @@ def parse_dependency_info() -> dict:
     try:
         with open('requirements.txt') as dependencies:
             for line in map(str.strip, dependencies):
-                link = HTTP.match(line)
+                link = REMOTE.match(line)
                 if link:
                     packages.append(link.group(1))
                     links.append(line)

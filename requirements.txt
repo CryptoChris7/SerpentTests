@@ -1,2 +1,1 @@
-https://github.com/CryptoChris7/pyethereum/archive/develop.tar.gz#egg=ethereum
-https://github.com/CryptoChris7/serpent/archive/develop.tar.gz#egg=ethereum-serpent
+attr
