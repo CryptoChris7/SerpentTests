@@ -1,4 +1,4 @@
-def fib(n):
+def fib(n: uint256):
     with a = 0:
         with b = 1:
             while n > 0:
@@ -7,3 +7,11 @@ def fib(n):
                     b = temp
                 n -= 1
             return(a)
+
+def saveMyFib(n: uint256):
+    with my_fib = self.fib(n):
+        sstore(msg.sender, my_fib)
+        return(my_fib)
+
+def loadMyFib():
+    return(sload(msg.sender))
