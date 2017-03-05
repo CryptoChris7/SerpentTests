@@ -9,7 +9,7 @@ from typing import List
 
 __author__ = 'Chris Calderon'
 __email__ = 'chris-da-dev@augur.net'
-__version__ = '3.1.0'
+__version__ = '3.1.1'
 __license__ = 'MIT'
 
 GLOBAL_STATE = ethereum.tester.state()
@@ -25,8 +25,8 @@ class Account:
     )
 
     @property
-    def address(self):
-        return binascii.hexlify(self.raw_address).decode()
+    def address(self) -> bytes:
+        return binascii.hexlify(self.raw_address)
 
 default_accounts = list(
     map(
