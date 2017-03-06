@@ -1,4 +1,4 @@
-from serpent_tests import ContractTest, run_tests
+from serpent_tests import ContractTest, default_accounts
 
 
 class FibsTest(ContractTest):
@@ -9,11 +9,14 @@ class FibsTest(ContractTest):
         self.assertEqual(self.contract.fib(5), 5)
         self.assertEqual(self.contract.fib(10), 55)
 
-    def test_saveMyFib(self):
-        self.assertEqual(self.contract.saveMyFib(10), 55)
+    def test_saveFib(self):
+        with self.assertTxFail():
+            baddie = default_accounts[1].private_key
+            self.contract.saveFib(self.creator.address, 10, sender=baddie)
+        self.assertEqual(self.contract.saveFib(self.creator.address, 10), 55)
 
     def test_loadMyFib(self):
         self.assertEqual(self.contract.loadMyFib(), 55)
 
 if __name__ == '__main__':
-    run_tests()
+    FibsTest.run_tests()

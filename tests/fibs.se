@@ -6,12 +6,14 @@ def fib(n: uint256):
                     a = b
                     b = temp
                 n -= 1
-            return(a)
+            return(a: uint256)
 
-def saveMyFib(n: uint256):
+def saveFib(owner: address, n: uint256):
+    if owner != msg.sender:
+        ~jump(0x100000000)  # causes transaction fail
     with my_fib = self.fib(n):
         sstore(msg.sender, my_fib)
-        return(my_fib)
+        return(my_fib: uint256)
 
 def loadMyFib():
     return(sload(msg.sender))
