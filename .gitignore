@@ -62,7 +62,7 @@ target/
 .ipynb_checkpoints
 
 # Emacs autosaves
-*.py~
+*.~
 
 # Virtualenv directories
 bin/
